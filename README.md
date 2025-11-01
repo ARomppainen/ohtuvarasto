@@ -12,3 +12,7 @@ Testien suorittaminen ja testikattavuuden raportointi
 `poetry run coverage run --branch -m pytest`
 
 `coverage html`
+
+Staattinen koodianalyysi
+
+`poetry run pylint src`
