@@ -1,5 +1,5 @@
 # ohtuvarasto
-Ohjelmistotuotanto-kurssin [viikon 1](https://ohjelmistotuotanto-hy.github.io/tehtavat1) harjoituksia
+Ohjelmistotuotanto-kurssin viikkojen [1](https://ohjelmistotuotanto-hy.github.io/tehtavat1) ja [2](https://ohjelmistotuotanto-hy.github.io/tehtavat2) harjoituksia
 
 [![CI](https://github.com/ARomppainen/ohtuvarasto/actions/workflows/main.yml/badge.svg)](https://github.com/ARomppainen/ohtuvarasto/actions)
 
