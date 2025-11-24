@@ -1,5 +1,5 @@
 import unittest
-from app import app, warehouses
+from app import app, repository
 
 
 class TestFlaskApp(unittest.TestCase):
@@ -7,10 +7,14 @@ class TestFlaskApp(unittest.TestCase):
         self.app = app
         self.app.config['TESTING'] = True
         self.client = self.app.test_client()
-        warehouses.clear()
+        # Clear the repository before each test
+        repository._warehouses.clear()
+        repository._next_id = 1
 
     def tearDown(self):
-        warehouses.clear()
+        # Clear the repository after each test
+        repository._warehouses.clear()
+        repository._next_id = 1
 
     def test_index_shows_empty_warehouses(self):
         response = self.client.get('/')
@@ -31,7 +35,7 @@ class TestFlaskApp(unittest.TestCase):
         }, follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'Testivarasto', response.data)
-        self.assertEqual(len(warehouses), 1)
+        self.assertEqual(len(repository.get_all()), 1)
 
     def test_index_shows_created_warehouse(self):
         self.client.post('/create', data={
@@ -51,7 +55,7 @@ class TestFlaskApp(unittest.TestCase):
             'tilavuus': '100',
             'alku_saldo': '20'
         })
-        warehouse_id = list(warehouses.keys())[0]
+        warehouse_id = list(repository.get_all().keys())[0]
         response = self.client.get(f'/edit/{warehouse_id}')
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'Muokkaa varastoa', response.data)
@@ -63,7 +67,7 @@ class TestFlaskApp(unittest.TestCase):
             'tilavuus': '100',
             'alku_saldo': '20'
         })
-        warehouse_id = list(warehouses.keys())[0]
+        warehouse_id = list(repository.get_all().keys())[0]
         response = self.client.post(f'/edit/{warehouse_id}', data={
             'nimi': 'Muokattu varasto',
             'tilavuus': '150',
@@ -71,8 +75,9 @@ class TestFlaskApp(unittest.TestCase):
         }, follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'Muokattu varasto', response.data)
-        self.assertEqual(warehouses[warehouse_id]['nimi'], 'Muokattu varasto')
-        self.assertEqual(warehouses[warehouse_id]['varasto'].tilavuus, 150)
+        warehouse = repository.get_by_id(warehouse_id)
+        self.assertEqual(warehouse.nimi, 'Muokattu varasto')
+        self.assertEqual(warehouse.varasto.tilavuus, 150)
 
     def test_add_content_get(self):
         self.client.post('/create', data={
@@ -80,7 +85,7 @@ class TestFlaskApp(unittest.TestCase):
             'tilavuus': '100',
             'alku_saldo': '20'
         })
-        warehouse_id = list(warehouses.keys())[0]
+        warehouse_id = list(repository.get_all().keys())[0]
         response = self.client.get(f'/add/{warehouse_id}')
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'varastoon', response.data)
@@ -91,12 +96,13 @@ class TestFlaskApp(unittest.TestCase):
             'tilavuus': '100',
             'alku_saldo': '20'
         })
-        warehouse_id = list(warehouses.keys())[0]
+        warehouse_id = list(repository.get_all().keys())[0]
         response = self.client.post(f'/add/{warehouse_id}', data={
             'maara': '10'
         }, follow_redirects=True)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(warehouses[warehouse_id]['varasto'].saldo, 30)
+        warehouse = repository.get_by_id(warehouse_id)
+        self.assertEqual(warehouse.varasto.saldo, 30)
 
     def test_delete_warehouse(self):
         self.client.post('/create', data={
@@ -104,12 +110,12 @@ class TestFlaskApp(unittest.TestCase):
             'tilavuus': '100',
             'alku_saldo': '20'
         })
-        warehouse_id = list(warehouses.keys())[0]
-        self.assertEqual(len(warehouses), 1)
+        warehouse_id = list(repository.get_all().keys())[0]
+        self.assertEqual(len(repository.get_all()), 1)
         
         response = self.client.post(f'/delete/{warehouse_id}', follow_redirects=True)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(warehouses), 0)
+        self.assertEqual(len(repository.get_all()), 0)
 
     def test_edit_nonexistent_warehouse_redirects(self):
         response = self.client.get('/edit/999', follow_redirects=True)
