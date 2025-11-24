@@ -54,6 +54,9 @@ class WarehouseRepository(ABC):
                tilavuus: float, alku_saldo: float) -> bool:
         """Update an existing warehouse.
 
+        Note: This replaces the warehouse entirely, including its capacity
+        and balance. Any previous state is lost.
+
         Args:
             warehouse_id: The ID of the warehouse to update.
             nimi: New name of the warehouse.
@@ -79,12 +82,23 @@ class WarehouseRepository(ABC):
     def add_to_warehouse(self, warehouse_id: int, maara: float) -> bool:
         """Add content to a warehouse.
 
+        The amount added respects the warehouse's capacity constraints.
+        If adding would exceed capacity, only enough is added to fill
+        the warehouse.
+
         Args:
             warehouse_id: The ID of the warehouse.
             maara: Amount to add.
 
         Returns:
             True if addition was successful, False otherwise.
+        """
+
+    @abstractmethod
+    def clear(self) -> None:
+        """Clear all warehouses from the repository.
+
+        This method is primarily intended for testing purposes.
         """
 
 
@@ -140,3 +154,8 @@ class InMemoryWarehouseRepository(WarehouseRepository):
 
         warehouse.varasto.lisaa_varastoon(maara)
         return True
+
+    def clear(self) -> None:
+        """Clear all warehouses from the repository."""
+        self._warehouses.clear()
+        self._next_id = 1

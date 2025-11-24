@@ -8,13 +8,11 @@ class TestFlaskApp(unittest.TestCase):
         self.app.config['TESTING'] = True
         self.client = self.app.test_client()
         # Clear the repository before each test
-        repository._warehouses.clear()
-        repository._next_id = 1
+        repository.clear()
 
     def tearDown(self):
         # Clear the repository after each test
-        repository._warehouses.clear()
-        repository._next_id = 1
+        repository.clear()
 
     def test_index_shows_empty_warehouses(self):
         response = self.client.get('/')
