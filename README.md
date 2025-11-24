@@ -7,6 +7,12 @@ Ohjelmistotuotanto-kurssin viikkojen [1](https://ohjelmistotuotanto-hy.github.io
 
 ## Hyödyllisiä komentoja
 
+Web-käyttöliittymän käynnistäminen
+
+`cd src && poetry run python app.py`
+
+Web-käyttöliittymä käynnistyy osoitteeseen http://127.0.0.1:5000/
+
 Testien suorittaminen ja testikattavuuden raportointi
 
 `poetry run coverage run --branch -m pytest`

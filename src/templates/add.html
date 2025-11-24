@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Lisää sisältöä - Ohtuvarasto{% endblock %}
+
+{% block content %}
+<div class="container">
+    <a href="{{ url_for('index') }}" class="back-link">&larr; Takaisin</a>
+    <h1>Lisää sisältöä varastoon: {{ warehouse.nimi if warehouse.nimi else 'Varasto ' ~ warehouse.id }}</h1>
+    
+    <div class="warehouse-info">
+        <p><strong>Tilavuus:</strong> {{ warehouse.varasto.tilavuus }}</p>
+        <p><strong>Nykyinen saldo:</strong> {{ warehouse.varasto.saldo }}</p>
+        <p><strong>Vapaata tilaa:</strong> {{ warehouse.varasto.paljonko_mahtuu() }}</p>
+    </div>
+
+    <form action="{{ url_for('add', warehouse_id=warehouse.id) }}" method="post">
+        <label for="maara">Lisättävä määrä:</label>
+        <input type="number" id="maara" name="maara" step="0.01" min="0" max="{{ warehouse.varasto.paljonko_mahtuu() }}" required>
+
+        <button type="submit">Lisää varastoon</button>
+        <a href="{{ url_for('index') }}" class="button secondary-btn">Peruuta</a>
+    </form>
+</div>
+{% endblock %}

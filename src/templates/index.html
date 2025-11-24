@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Varastot - Ohtuvarasto{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Ohtuvarasto</h1>
+    <a href="{{ url_for('create') }}" class="button">Luo uusi varasto</a>
+</div>
+
+{% if warehouses %}
+<div class="container">
+    <h2>Varastot</h2>
+    {% for id, warehouse in warehouses.items() %}
+    <div class="warehouse">
+        <h3>{{ warehouse.nimi if warehouse.nimi else 'Varasto ' ~ id }}</h3>
+        <div class="warehouse-info">
+            <p><strong>Tilavuus:</strong> {{ warehouse.varasto.tilavuus }}</p>
+            <p><strong>Saldo:</strong> {{ warehouse.varasto.saldo }}</p>
+            <p><strong>Vapaata tilaa:</strong> {{ warehouse.varasto.paljonko_mahtuu() }}</p>
+        </div>
+        <div class="actions">
+            <a href="{{ url_for('add', warehouse_id=id) }}" class="button">Lisää sisältöä</a>
+            <a href="{{ url_for('edit', warehouse_id=id) }}" class="button secondary-btn">Muokkaa</a>
+            <form action="{{ url_for('delete', warehouse_id=id) }}" method="post" style="display: inline;">
+                <button type="submit" class="delete-btn" onclick="return confirm('Haluatko varmasti poistaa tämän varaston?')">Poista</button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="container">
+    <p>Ei varastoja. <a href="{{ url_for('create') }}">Luo uusi varasto</a></p>
+</div>
+{% endif %}
+{% endblock %}
